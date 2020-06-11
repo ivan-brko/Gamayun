@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("com.moandjiezana.toml:toml4j:0.7.2")
 }
 
 tasks {
