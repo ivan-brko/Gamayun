@@ -1,5 +1,10 @@
-import config.ConfigurationReader
 import config.TomlConfigurationReader
+import kotlinx.coroutines.runBlocking
+import storage.PrimitiveDataRepository
+import supervision.BasicSupervisor
+import supervision.GamayunResultServer
+import supervision.GamayunResultService
+import supervision.PrimitiveGrpcResultListener
 
 fun main(args: Array<String>) {
     val configuration = TomlConfigurationReader().readConfiguration("/home/brko/temp/gconf")
@@ -11,4 +16,16 @@ fun main(args: Array<String>) {
             println("arg $index --- $arg")
         }
     }
+
+    val listener = PrimitiveGrpcResultListener()
+    val repository = PrimitiveDataRepository()
+    val supervisor = BasicSupervisor(listener, repository)
+    val gamayunResultService = GamayunResultServer()
+    gamayunResultService.start()
+    runBlocking{
+        val output = supervisor.runCommand(configuration.first().pathToExecutable, configuration.first().args)
+        println(output)
+    }
+
+    readLine()
 }
