@@ -1,5 +1,7 @@
 package scheduling
 
+import config.JobConfig
+
 interface Scheduler{
-    fun scheduleTaskForExecution(task: (Unit) -> Unit, cron: String)
+    fun scheduleJobs (jobs: List<JobConfig>): Unit
 }

@@ -26,6 +26,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7")
+    implementation("org.quartz-scheduler:quartz:2.3.2")
 
     implementation("com.google.protobuf:protobuf-java:3.6.1")
     implementation("com.google.protobuf:protobuf-java-util:3.6.1")

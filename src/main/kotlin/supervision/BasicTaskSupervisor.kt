@@ -5,13 +5,13 @@ import kotlinx.coroutines.withContext
 import storage.DataRepository
 import java.io.IOException
 
-class BasicSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) : Supervisor {
-    override suspend fun runTask(taskInfo: TaskInfo) {
-        runCommand(taskInfo.pathToExe, taskInfo.args)
+class BasicTaskSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) : TaskSupervisor {
+    override suspend fun runTask(taskConfig: TaskConfig) {
+        runCommand(taskConfig.pathToExe, taskConfig.args)
     }
 
     //c/p from so with some coroutine modifications
-    suspend fun runCommand(executable: String, args: List<String>): String? =
+    private suspend fun runCommand(executable: String, args: List<String>): String? =
         withContext(Dispatchers.IO) {
             try {
                 val executableWithArgs = mutableListOf<String>().let {
@@ -29,6 +29,7 @@ class BasicSupervisor(private val listener: ResultListener, private val dataRepo
                 //todo: kill process if it is still running
 
                 dataRepository.storeResult("abc", result ?: "test")
+
 
                 proc.inputStream.bufferedReader().readText()
             } catch (e: IOException) {

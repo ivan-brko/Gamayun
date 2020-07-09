@@ -14,7 +14,8 @@ class TomlConfigurationReader : ConfigurationReader {
         }
 
     override fun readConfiguration(configurationRoot: String): List<JobConfig> =
-        File(configurationRoot).walk()
+        File(configurationRoot)
+            .walk()
             .filter { it.name.endsWith(".gamayunConf.toml") }
             .map { it.parseTomlJobFile() }
             .toList()
