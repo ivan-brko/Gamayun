@@ -15,7 +15,7 @@ service Result{
 
 // The request message containing the user's name.
 message TaskResult {
-  int32 jobId = 1;
+  string jobId = 1;
   repeated string results = 2;
 }
 

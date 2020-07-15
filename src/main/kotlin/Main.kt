@@ -12,13 +12,15 @@ fun main(args: Array<String>) {
 
 //    scheduler.testScheduling()
 
-    val listener = PrimitiveGrpcResultListener()
+    val gamayunResultService = GamayunResultServer()
+    gamayunResultService.start()
+
+    val listener = PrimitiveGrpcResultListener(gamayunResultService)
     val repository = PrimitiveDataRepository()
     val supervisor = BasicTaskSupervisor(listener, repository)
     val scheduler = QuartzScheduler(supervisor)
     scheduler.scheduleJobs(configuration)
-    val gamayunResultService = GamayunResultServer()
-    gamayunResultService.start()
+
 //    runBlocking{
 //        val output = supervisor.runCommand(configuration.first().pathToExecutable, configuration.first().args)
 //        println(output)
