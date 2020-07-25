@@ -5,7 +5,8 @@ import kotlinx.coroutines.withContext
 import storage.DataRepository
 import java.io.IOException
 
-class BasicTaskSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) : TaskSupervisor {
+class BasicTaskSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) :
+    TaskSupervisor {
     override suspend fun runTask(taskConfig: TaskConfig) {
         runCommand(taskConfig)
     }
@@ -25,11 +26,10 @@ class BasicTaskSupervisor(private val listener: ResultListener, private val data
                     .redirectError(ProcessBuilder.Redirect.PIPE)
                     .start() //this line doesn't block until program stops executing, only until program is started
 
-                val result = listener.listenForResult(taskConfig.name, 50000)
-                if (result != null){
-                    println(result)
-                }
-                else {
+                val result = listener.listenForResult(taskConfig.name, 1000)
+                if (result != null) {
+                    dataRepository.storeResult(taskConfig.name, result)
+                } else {
                     println("No result!")
                 }
                 //todo: kill process if it is still running

@@ -2,6 +2,6 @@ package scheduling
 
 import config.JobConfig
 
-interface Scheduler{
-    fun scheduleJobs (jobs: List<JobConfig>): Unit
+interface Scheduler {
+    fun scheduleJobs(jobs: List<JobConfig>): Unit
 }

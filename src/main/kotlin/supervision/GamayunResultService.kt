@@ -10,7 +10,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 
 class GamayunResultServer {
-    private class GamayunResultService(private val resultMap: MutableMap<String, List<String>>) : ResultGrpcKt.ResultCoroutineImplBase() {
+    private class GamayunResultService(private val resultMap: MutableMap<String, List<String>>) :
+        ResultGrpcKt.ResultCoroutineImplBase() {
         override suspend fun reportResult(request: TaskResult): EmptyResponse {
             resultMap[request.jobId] = request.resultsList
 //            println(request.resultsList)
@@ -26,9 +27,9 @@ class GamayunResultServer {
         server.start()
     }
 
-    suspend fun getResultsForJobId(jobId: String) : Deferred<List<String>> =
-        GlobalScope.async{
-            while(!resultMap.containsKey(jobId)){
+    suspend fun getResultsForJobId(jobId: String): Deferred<List<String>> =
+        GlobalScope.async {
+            while (!resultMap.containsKey(jobId)) {
                 delay(50)
             }
 

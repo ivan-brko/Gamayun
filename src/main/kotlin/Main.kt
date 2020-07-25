@@ -1,16 +1,16 @@
 import config.TomlConfigurationReader
-import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import scheduling.QuartzScheduler
 import storage.PrimitiveDataRepository
 import supervision.BasicTaskSupervisor
 import supervision.GamayunResultServer
 import supervision.PrimitiveGrpcResultListener
 
+
 fun main(args: Array<String>) {
+    val logger = KotlinLogging.logger{}
+    logger.info { "Starting Gamayun application" }
     val configuration = TomlConfigurationReader().readConfiguration("/home/brko/temp/gconf")
-
-
-//    scheduler.testScheduling()
 
     val gamayunResultService = GamayunResultServer()
     gamayunResultService.start()
@@ -20,11 +20,6 @@ fun main(args: Array<String>) {
     val supervisor = BasicTaskSupervisor(listener, repository)
     val scheduler = QuartzScheduler(supervisor)
     scheduler.scheduleJobs(configuration)
-
-//    runBlocking{
-//        val output = supervisor.runCommand(configuration.first().pathToExecutable, configuration.first().args)
-//        println(output)
-//    }
 
     readLine()
 }
