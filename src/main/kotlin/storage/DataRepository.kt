@@ -1,5 +1,5 @@
 package storage
 
 interface DataRepository {
-    fun storeResult(jobId: String, result: List<String>): Unit
+    suspend fun storeResult(jobId: String, result: List<String>)
 }

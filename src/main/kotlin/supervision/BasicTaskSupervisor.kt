@@ -1,43 +1,54 @@
 package supervision
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import storage.DataRepository
 import java.io.IOException
 
+private val logger = KotlinLogging.logger {}
+
 class BasicTaskSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) :
     TaskSupervisor {
-    override suspend fun runTask(taskConfig: TaskConfig) {
-        runCommand(taskConfig)
-    }
 
-    //c/p from so with some coroutine modifications
-    private suspend fun runCommand(taskConfig: TaskConfig) =
-        withContext(Dispatchers.IO) {
-            try {
-                val executableWithArgs = mutableListOf<String>().let {
-                    it.add(taskConfig.pathToExe)
-                    it.addAll(taskConfig.args)
-                    it.toList()
-                }
+    override suspend fun runTask(taskConfig: TaskConfig) = try {
+        val executableWithArgs = taskConfig.toExecutableWithArgs()
 
-                val proc = ProcessBuilder(executableWithArgs)
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                    .start() //this line doesn't block until program stops executing, only until program is started
-
-                val result = listener.listenForResult(taskConfig.name, 1000)
-                if (result != null) {
-                    dataRepository.storeResult(taskConfig.name, result)
-                } else {
-                    println("No result!")
-                }
-                //todo: kill process if it is still running
-
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            }
+        val process = withContext(Dispatchers.IO) {
+            ProcessBuilder(executableWithArgs)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start() //this line doesn't block until program stops executing, only until program is started
         }
 
+        val result = listener.listenForResult(taskConfig.name, taskConfig.resultWaitTimeoutMillis)
+
+        process.destroyAsync() //in case something is left hanging
+
+        if (result != null) {
+            dataRepository.storeResult(taskConfig.name, result)
+        } else {
+            logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
+        }
+
+    } catch (e: IOException) {
+        logger.warn { "IO error while listening for result for jobId ${taskConfig.name}: \n${e.stackTrace}" }
+    }
+
+    private fun TaskConfig.toExecutableWithArgs(): List<String> =
+        mutableListOf<String>().run {
+            add(pathToExe)
+            addAll(args)
+            toList()
+        }
+
+    private suspend fun Process.destroyAsync() {
+        coroutineScope {
+            async {
+                destroy() //todo: check if this is enough to kill everything
+            }
+        }
+    }
 }
