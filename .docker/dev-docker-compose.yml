@@ -1,0 +1,16 @@
+version : '3.8'
+
+services:
+  mongodb-gamayun:
+      image: mongo:latest
+      container_name: mongodb-gamayun
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: gamayun
+        MONGO_INITDB_ROOT_PASSWORD: gamayun
+      ports:
+        - 27017:27017
+      volumes:
+        - gamayun_db:/data/db
+  
+volumes:
+  gamayun_db:

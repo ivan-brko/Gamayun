@@ -13,6 +13,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
     idea
     id("com.google.protobuf") version "0.8.8"
+    kotlin("plugin.serialization") version "1.3.70"
 }
 
 group = "org.unfold"
@@ -20,6 +21,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -29,6 +31,8 @@ dependencies {
     implementation("org.quartz-scheduler:quartz:2.3.2")
     implementation("io.github.microutils:kotlin-logging:1.8.3")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
+    implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.0.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
     implementation("com.google.protobuf:protobuf-java:3.6.1")
     implementation("com.google.protobuf:protobuf-java-util:3.6.1")

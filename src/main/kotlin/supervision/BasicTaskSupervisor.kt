@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import processing.ResultProcessor
 import storage.DataRepository
 import java.io.IOException
 
@@ -28,7 +29,8 @@ class BasicTaskSupervisor(private val listener: ResultListener, private val data
         process.destroyAsync() //in case something is left hanging
 
         if (result != null) {
-            dataRepository.storeResult(taskConfig.name, result)
+            val documents = result.map { ResultProcessor.toGamayunBson(it) }
+            dataRepository.storeResult(taskConfig.name, documents)
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
         }

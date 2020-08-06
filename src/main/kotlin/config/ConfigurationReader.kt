@@ -8,6 +8,16 @@ data class JobConfig(
     val resultWaitTimeoutMillis: Long
 )
 
+data class MongoDbConfig(
+    val connectionString: String,
+    val databaseName: String
+)
+
+data class DatabaseConfig(
+    val mongodb: MongoDbConfig
+)
+
 interface ConfigurationReader {
-    fun readConfiguration(configurationRoot: String): List<JobConfig>
+    fun readJobsConfiguration(configurationRoot: String): List<JobConfig>
+    fun readDatabaseConfiguration(configurationRoot: String): DatabaseConfig
 }
