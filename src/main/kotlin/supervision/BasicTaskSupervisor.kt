@@ -7,11 +7,17 @@ import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import processing.ResultProcessor
 import storage.DataRepository
+import supervision.errorReport.ErrorReporter
 import java.io.IOException
+
 
 private val logger = KotlinLogging.logger {}
 
-class BasicTaskSupervisor(private val listener: ResultListener, private val dataRepository: DataRepository) :
+class BasicTaskSupervisor(
+    private val listener: ResultListener,
+    private val dataRepository: DataRepository,
+    private val errorReporter: ErrorReporter
+) :
     TaskSupervisor {
 
     override suspend fun runTask(taskConfig: TaskConfig) = try {
@@ -29,10 +35,11 @@ class BasicTaskSupervisor(private val listener: ResultListener, private val data
         process.destroyAsync() //in case something is left hanging
 
         if (result != null) {
-            val documents = result.map { ResultProcessor.toGamayunBson(it) }
+            val documents = result.map { ResultProcessor.toGamayunBson(it, taskConfig.tags) }
             dataRepository.storeResult(taskConfig.name, documents)
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
+            errorReporter.reportErrorForJob(taskConfig.name)
         }
 
     } catch (e: IOException) {
@@ -53,4 +60,16 @@ class BasicTaskSupervisor(private val listener: ResultListener, private val data
             }
         }
     }
+
+    /*private fun sendMailNotification(jobId: String) {
+        val email = EmailBuilder.startingBlank()
+            .to("Ivan Brko", "ivan.brko@outlook.com")
+            .from("Gamayun Notifier", "gamayun-notifier@gmail.com")
+            .withSubject("Gamayun report")
+            .withPlainText("Error for $jobId")
+            .buildEmail()
+
+        MailerBuilder.withSMTPServer("smtp.gmail.com", 587, "gamayun.notifier@gmail.com", "jiBRof21").buildMailer()
+            .sendMail(email)
+    }*/
 }

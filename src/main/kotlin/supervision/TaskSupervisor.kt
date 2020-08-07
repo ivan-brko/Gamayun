@@ -6,11 +6,12 @@ data class TaskConfig(
     val name: String,
     val pathToExe: String,
     val args: List<String>,
-    val resultWaitTimeoutMillis: Long
+    val resultWaitTimeoutMillis: Long,
+    val tags: List<String>
 )
 
 fun JobConfig.toTaskConfig() =
-    TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis)
+    TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis, tags)
 
 interface TaskSupervisor {
     suspend fun runTask(taskConfig: TaskConfig)

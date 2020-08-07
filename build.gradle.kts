@@ -34,6 +34,8 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
+    implementation("org.simplejavamail:simple-java-mail:6.4.3")
+
     implementation("com.google.protobuf:protobuf-java:3.6.1")
     implementation("com.google.protobuf:protobuf-java-util:3.6.1")
     implementation("io.grpc:grpc-kotlin-stub:0.1.4")
