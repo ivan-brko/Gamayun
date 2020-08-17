@@ -1,10 +1,13 @@
 package supervision.errorReport
 
 import config.ConfigurationReader
+import mu.KotlinLogging
 import org.kodein.di.DI
 import org.kodein.di.instance
 import org.simplejavamail.email.EmailBuilder
 import org.simplejavamail.mailer.MailerBuilder
+
+private val logger = KotlinLogging.logger {}
 
 class MailErrorReporter(private val kodein: DI) : ErrorReporter {
 
@@ -30,7 +33,7 @@ class MailErrorReporter(private val kodein: DI) : ErrorReporter {
             ).buildMailer()
                 .sendMail(email)
         } else {
-            //todo: Log!
+            logger.warn("Invalid mail configuration!")
         }
     }
 }

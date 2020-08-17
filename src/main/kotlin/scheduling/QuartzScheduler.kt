@@ -48,9 +48,10 @@ class QuartzScheduler(kodein: DI) : Scheduler {
 
     private fun scheduleJob(jobConfig: JobConfig, scheduler: org.quartz.Scheduler) {
         logger.info { "Scheduling job ${jobConfig.name}" }
-        val jobDataMap = JobDataMap()
-        jobDataMap["jobConfig"] = jobConfig
-        jobDataMap["taskSupervisor"] = taskSupervisor
+        val jobDataMap = JobDataMap().also {
+            it["jobConfig"] = jobConfig
+            it["taskSupervisor"] = taskSupervisor
+        }
 
         val job =
             JobBuilder.newJob(GamayunJob::class.java)
