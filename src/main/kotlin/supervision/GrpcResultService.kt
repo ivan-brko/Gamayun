@@ -2,12 +2,12 @@ package supervision
 
 import io.grpc.Server
 import io.grpc.ServerBuilder
-import io.grpc.examples.helloworld.EmptyResponse
-import io.grpc.examples.helloworld.ResultGrpcKt
-import io.grpc.examples.helloworld.TaskResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import mu.KotlinLogging
+import org.gamayun.proto.EmptyResponse
+import org.gamayun.proto.ResultGrpcKt
+import org.gamayun.proto.TaskResult
 
 private val logger = KotlinLogging.logger {}
 
@@ -19,10 +19,10 @@ class GrpcResultServer {
         ResultGrpcKt.ResultCoroutineImplBase() {
 
         override suspend fun reportResult(request: TaskResult): EmptyResponse {
-            if (listeningForResults.contains(request.jobId)) {
-                resultMap[request.jobId] = request.resultsList
+            if (listeningForResults.contains(request.jobName)) {
+                resultMap[request.jobName] = request.resultsList
             } else {
-                logger.warn { "Received result for jobId ${request.jobId} for which listening is not active. Will ignore!" }
+                logger.warn { "Received result for jobId ${request.jobName} for which listening is not active. Will ignore!" }
             }
 
             return EmptyResponse.getDefaultInstance()

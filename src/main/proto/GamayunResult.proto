@@ -1,24 +1,24 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "io.grpc.examples.helloworld";
-option java_outer_classname = "HelloWorldProto";
-option objc_class_prefix = "HLW";
+option java_package = "org.gamayun.proto";
+option java_outer_classname = "GamayunResultReporter";
+option objc_class_prefix = "GMY";
 
 package gamayun;
 
-// The greeting service definition.
+// The result service definition.
 service Result{
-  // Sends a greeting
+  // Reports a result to Gamayun
   rpc ReportResult (TaskResult) returns (EmptyResponse) {}
 }
 
-// The request message containing the user's name.
+// Result containing jobName and Results
 message TaskResult {
-  string jobId = 1;
+  string jobName = 1;
   repeated string results = 2;
 }
 
-// The response message containing the greetings
+// The empty response
 message EmptyResponse {
 }
