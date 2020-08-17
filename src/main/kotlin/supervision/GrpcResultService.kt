@@ -37,7 +37,7 @@ class GrpcResultServer {
             .addService(GamayunResultService(resultMap, listeningForResults))
             .build()
 
-    fun start() {
+    init {
         logger.info { "Starting Gamayun GRPC Server" }
         server.start()
     }
