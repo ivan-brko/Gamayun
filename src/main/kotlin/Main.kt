@@ -1,18 +1,14 @@
-import config.TomlConfigurationReader
+import config.ConfigurationReader
+import di.KodeinSetup.setupDi
 import mu.KotlinLogging
-import scheduling.QuartzScheduler
-import storage.mongo.MongoDataRepository
-import storage.mongo.MongoDbSettings
-import supervision.BasicTaskSupervisor
-import supervision.GamayunGrpcResultListener
-import supervision.GrpcResultServer
-import supervision.errorReport.MailErrorReporter
+import org.kodein.di.instance
+import scheduling.Scheduler
 
 
 fun main(args: Array<String>) {
     val logger = KotlinLogging.logger {}
     logger.info { "Starting Gamayun application" }
-    val configurationReader = TomlConfigurationReader("/home/brko/temp/gconf")
+    /*val configurationReader = TomlConfigurationReader("/home/brko/temp/gconf")
     val jobsConfiguration = configurationReader.readJobsConfiguration()
 
     val resultServer = GrpcResultServer()
@@ -23,8 +19,16 @@ fun main(args: Array<String>) {
     val repository = MongoDataRepository(mongoDbSettings)
     val mailErrorReporter = MailErrorReporter(configurationReader.readErrorReportingConfiguration())
     val supervisor = BasicTaskSupervisor(listener, repository, mailErrorReporter)
-    val scheduler = QuartzScheduler(supervisor)
-    scheduler.scheduleJobs(jobsConfiguration)
+    val scheduler = QuartzScheduler(supervisor)*/
+
+    val configurationRoot = System.getenv("GAMAYUN_CONF_ROOT")
+        ?: throw IllegalArgumentException("Configuration Root (GAMAYUN_CONF_ROOT) env var not set")
+
+    val kodein = setupDi(configurationRoot)
+    val scheduler : Scheduler by kodein.instance()
+    val configurationReader: ConfigurationReader by kodein.instance()
+
+    scheduler.scheduleJobs(configurationReader.readJobsConfiguration())
 
     readLine()
 }

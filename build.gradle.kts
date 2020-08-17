@@ -10,10 +10,10 @@ buildscript{
 }
 
 plugins {
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.0"
     idea
     id("com.google.protobuf") version "0.8.8"
-    kotlin("plugin.serialization") version "1.3.70"
+    kotlin("plugin.serialization") version "1.4.0"
 }
 
 group = "org.unfold"
@@ -33,7 +33,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-
+    implementation("org.kodein.di:kodein-di:7.0.0")
     implementation("org.simplejavamail:simple-java-mail:6.4.3")
 
     implementation("com.google.protobuf:protobuf-java:3.6.1")

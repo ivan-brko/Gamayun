@@ -4,6 +4,8 @@ import config.JobConfig
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import org.kodein.di.DI
+import org.kodein.di.instance
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
 import supervision.TaskSupervisor
@@ -32,7 +34,9 @@ class GamayunJob : Job {
     }
 }
 
-class QuartzScheduler(private val taskSupervisor: TaskSupervisor) : Scheduler {
+class QuartzScheduler(kodein: DI) : Scheduler {
+
+    private val taskSupervisor: TaskSupervisor by kodein.instance()
 
     override fun scheduleJobs(jobs: List<JobConfig>) {
         val scheduler = StdSchedulerFactory().scheduler

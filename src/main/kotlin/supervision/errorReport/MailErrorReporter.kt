@@ -1,11 +1,17 @@
 package supervision.errorReport
 
-import config.ErrorReportConfig
+import config.ConfigurationReader
+import org.kodein.di.DI
+import org.kodein.di.instance
 import org.simplejavamail.email.EmailBuilder
 import org.simplejavamail.mailer.MailerBuilder
 
-class MailErrorReporter(private val errorReportConfig: ErrorReportConfig) : ErrorReporter {
+class MailErrorReporter(private val kodein: DI) : ErrorReporter {
+
+    private val configurationReader: ConfigurationReader by kodein.instance()
+
     override fun reportErrorForJob(jobId: String, errorMessage: String?) {
+        val errorReportConfig = configurationReader.readErrorReportingConfiguration()
         val mailConfiguration = errorReportConfig.mailConfiguration
 
         if (mailConfiguration != null) {

@@ -5,6 +5,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import org.kodein.di.DI
+import org.kodein.di.instance
 import processing.ResultProcessor
 import storage.DataRepository
 import supervision.errorReport.ErrorReporter
@@ -13,12 +15,11 @@ import java.io.IOException
 
 private val logger = KotlinLogging.logger {}
 
-class BasicTaskSupervisor(
-    private val listener: ResultListener,
-    private val dataRepository: DataRepository,
-    private val errorReporter: ErrorReporter
-) :
-    TaskSupervisor {
+class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
+    private val listener: ResultListener by kodein.instance()
+    private val dataRepository: DataRepository by kodein.instance()
+    private val errorReporter: ErrorReporter by kodein.instance()
+    private val resultProcessor: ResultProcessor by kodein.instance()
 
     override suspend fun runTask(taskConfig: TaskConfig) = try {
         val executableWithArgs = taskConfig.toExecutableWithArgs()
@@ -35,7 +36,7 @@ class BasicTaskSupervisor(
         process.destroyAsync() //in case something is left hanging
 
         if (result != null) {
-            val documents = result.map { ResultProcessor.toGamayunBson(it, taskConfig.tags) }
+            val documents = result.map { resultProcessor.toGamayunBson(it, taskConfig.tags) }
             dataRepository.storeResult(taskConfig.name, documents)
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
