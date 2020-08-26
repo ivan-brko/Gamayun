@@ -6,7 +6,7 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
-class TomlConfigurationReader(val configurationRoot: String) : ConfigurationReader {
+class TomlConfigurationReader(private val configurationRoot: String) : ConfigurationReader {
     private fun File.parseTomlJobFile(): JobConfig? =
         Toml().read(readText()).let { parsedToml ->
             val neededTomlValues =

@@ -61,16 +61,4 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
             }
         }
     }
-
-    /*private fun sendMailNotification(jobId: String) {
-        val email = EmailBuilder.startingBlank()
-            .to("Ivan Brko", "ivan.brko@outlook.com")
-            .from("Gamayun Notifier", "gamayun-notifier@gmail.com")
-            .withSubject("Gamayun report")
-            .withPlainText("Error for $jobId")
-            .buildEmail()
-
-        MailerBuilder.withSMTPServer("smtp.gmail.com", 587, "gamayun.notifier@gmail.com", "jiBRof21").buildMailer()
-            .sendMail(email)
-    }*/
 }

@@ -17,5 +17,6 @@ fun main(args: Array<String>) {
 
     scheduler.scheduleJobs(configurationReader.readJobsConfiguration())
 
+    //todo: look if this can be implemented nicer in kotlin
     readLine()
 }
