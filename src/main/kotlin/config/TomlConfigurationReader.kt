@@ -3,22 +3,37 @@ package config
 import com.moandjiezana.toml.Toml
 import mu.KotlinLogging
 import java.io.File
+import java.nio.file.Paths
 
 private val logger = KotlinLogging.logger {}
 
 class TomlConfigurationReader(private val configurationRoot: String) : ConfigurationReader {
+
+    private fun String.replaceConfigurationFilePathPlaceholder(configurationPath: String): String =
+        this.replace("\${CONFIGURATION_FILE_PATH}", configurationPath)
+
     private fun File.parseTomlJobFile(): JobConfig? =
         Toml().read(readText()).let { parsedToml ->
+            val pathToConfig = Paths.get(absolutePath).parent.toString()
             val neededTomlValues =
                 listOf("name", "pathToExecutable", "cronString", "arguments", "resultWaitTimeoutMillis", "tags")
 
             return if (neededTomlValues.all { parsedToml.contains(it) }) {
-                val name = parsedToml.getString("name")
-                val exePath = parsedToml.getString("pathToExecutable")
+                val name = parsedToml.getString("name").replaceConfigurationFilePathPlaceholder(pathToConfig)
+
+                val exePath =
+                    parsedToml.getString("pathToExecutable").replaceConfigurationFilePathPlaceholder(pathToConfig)
+
                 val cronString = parsedToml.getString("cronString")
+
                 val arguments = parsedToml.getList<String>("arguments")
+                    .map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
+
                 val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis")
+
                 val tags = parsedToml.getList<String>("tags")
+                    .map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
+
                 JobConfig(name, exePath, arguments, cronString, resultWaitTimeoutMillis, tags)
             } else {
                 logger.warn { "Configuration file $absoluteFile doesn't contain valid configuration. Will ignore file!" }
