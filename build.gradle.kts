@@ -14,10 +14,16 @@ plugins {
     idea
     id("com.google.protobuf") version "0.8.8"
     kotlin("plugin.serialization") version "1.4.0"
+    application
+    id("com.github.johnrengelman.shadow") version "6.0.0" //for fat-jar creation
 }
 
-group = "org.unfold"
-version = "1.0-SNAPSHOT"
+application {
+    mainClassName = "MainKt"
+}
+
+group = "org.gamayun"
+version = "0.2"
 
 repositories {
     mavenCentral()
