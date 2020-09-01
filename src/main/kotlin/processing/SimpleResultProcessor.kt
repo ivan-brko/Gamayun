@@ -1,10 +1,7 @@
 package processing
 
 import kotlinx.serialization.json.*
-import org.bson.BsonArray
-import org.bson.BsonDateTime
-import org.bson.BsonDocument
-import org.bson.BsonString
+import org.bson.*
 
 //todo: This whole part is not ideally written, it needs a rewrite
 class SimpleResultProcessor : ResultProcessor {
@@ -29,7 +26,11 @@ class SimpleResultProcessor : ResultProcessor {
                 jsonObject.forEach {
                     val key = it.component1()
                     val jsonElement = it.component2().primitive.contentOrNull
-                    bsonDocument[key] = BsonString(jsonElement)
+                    if (jsonElement != null) {
+                        bsonDocument[key] = BsonString(jsonElement)
+                    } else {
+                        bsonDocument[key] = BsonNull()
+                    }
                 }
             } else if (this is JsonPrimitive) {
                 val jsonElement = this.primitive.contentOrNull
