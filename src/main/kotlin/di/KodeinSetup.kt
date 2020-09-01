@@ -13,8 +13,8 @@ import storage.DataRepository
 import storage.mongo.MongoDataRepository
 import storage.mongo.MongoDbSettings
 import supervision.*
+import supervision.errorReport.ErrorReportSetup.setupErrorSupport
 import supervision.errorReport.ErrorReporter
-import supervision.errorReport.MailErrorReporter
 
 object KodeinSetup {
     fun setupDi(tomlConfigurationRoot: String) =
@@ -25,7 +25,7 @@ object KodeinSetup {
             bind<MongoDbSettings>() with singleton { MongoDbSettings(di) }
             bind<DataRepository>() with singleton { MongoDataRepository(di) }
             bind<ResultListener>() with singleton { GamayunGrpcResultListener(GrpcResultServer()) }
-            bind<ErrorReporter>() with singleton { MailErrorReporter(di) }
+            bind<List<ErrorReporter>>() with singleton { setupErrorSupport(di) }
             bind<TaskSupervisor>() with singleton { BasicTaskSupervisor(di) }
         }
 

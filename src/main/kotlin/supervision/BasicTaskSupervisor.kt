@@ -18,7 +18,7 @@ private val logger = KotlinLogging.logger {}
 class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     private val listener: ResultListener by kodein.instance()
     private val dataRepository: DataRepository by kodein.instance()
-    private val errorReporter: ErrorReporter by kodein.instance()
+    private val errorReporters: List<ErrorReporter> by kodein.instance()
     private val resultProcessor: ResultProcessor by kodein.instance()
 
     override suspend fun runTask(taskConfig: TaskConfig) = try {
@@ -29,7 +29,7 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start() //this line doesn't block until program stops executing, only until program is started
-        }
+        }               //ignore the warning, this is wrapped in Dispatchers.IO so it's not a problem that it is blocking
 
         val result = listener.listenForResult(taskConfig.name, taskConfig.resultWaitTimeoutMillis)
 
@@ -40,7 +40,7 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
             dataRepository.storeResult(taskConfig.name, documents)
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
-            errorReporter.reportErrorForJob(taskConfig.name)
+            errorReporters.forEach { it.reportErrorForJob(taskConfig.name) }
         }
 
     } catch (e: IOException) {
