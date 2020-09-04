@@ -5,10 +5,12 @@ import org.bson.*
 
 //todo: This whole part is not ideally written, it needs a rewrite
 class SimpleResultProcessor : ResultProcessor {
-    override fun toGamayunBson(data: String, tags: List<String>): BsonDocument {
+    override fun toGamayunBson(data: String, tags: List<String>?): BsonDocument {
         val json = data.toJson()
         val document = json?.toBsonDocument() ?: data.toBsonDocument()
-        document.addGamayunMetadata(tags)
+        if (tags != null) {
+            document.addGamayunMetadata(tags)
+        }
         return document
     }
 

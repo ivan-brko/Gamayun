@@ -3,10 +3,11 @@ package config
 data class JobConfig(
     val name: String,
     val pathToExecutable: String,
-    val args: List<String>,
+    val args: List<String>?,
     val cron: String,
     val resultWaitTimeoutMillis: Long,
-    val tags: List<String>
+    val tags: List<String>?,
+    val uniqueIds: List<String>?
 )
 
 data class MongoDbConfig(

@@ -50,7 +50,9 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     private fun TaskConfig.toExecutableWithArgs(): List<String> =
         mutableListOf<String>().run {
             add(pathToExe)
-            addAll(args)
+            if (args != null) {
+                addAll(args)
+            }
             toList()
         }
 

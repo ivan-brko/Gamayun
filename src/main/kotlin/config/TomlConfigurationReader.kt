@@ -16,7 +16,7 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
         Toml().read(readText()).let { parsedToml ->
             val pathToConfig = Paths.get(absolutePath).parent.toString()
             val neededTomlValues =
-                listOf("name", "pathToExecutable", "cronString", "arguments", "resultWaitTimeoutMillis", "tags")
+                listOf("name", "pathToExecutable", "cronString")
 
             return if (neededTomlValues.all { parsedToml.contains(it) }) {
                 val name = parsedToml.getString("name").replaceConfigurationFilePathPlaceholder(pathToConfig)
@@ -27,14 +27,15 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
                 val cronString = parsedToml.getString("cronString")
 
                 val arguments = parsedToml.getList<String>("arguments")
-                    .map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
+                    ?.map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
 
-                val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis")
+                val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis") ?: 5000
 
                 val tags = parsedToml.getList<String>("tags")
-                    .map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
 
-                JobConfig(name, exePath, arguments, cronString, resultWaitTimeoutMillis, tags)
+                val uniqueIds = parsedToml.getList<String>("uniqueIds")
+
+                JobConfig(name, exePath, arguments, cronString, resultWaitTimeoutMillis, tags, uniqueIds)
             } else {
                 logger.warn { "Configuration file $absoluteFile doesn't contain valid configuration. Will ignore file!" }
                 null
