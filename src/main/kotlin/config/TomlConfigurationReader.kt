@@ -31,11 +31,22 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
 
                 val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis") ?: 5000
 
+                val randomTriggerOffsetSeconds = parsedToml.getLong("randomTriggerOffsetSeconds")
+
                 val tags = parsedToml.getList<String>("tags")
 
                 val uniqueIds = parsedToml.getList<String>("uniqueIds")
 
-                JobConfig(name, exePath, arguments, cronString, resultWaitTimeoutMillis, tags, uniqueIds)
+                JobConfig(
+                    name,
+                    exePath,
+                    arguments,
+                    cronString,
+                    resultWaitTimeoutMillis,
+                    tags,
+                    uniqueIds,
+                    randomTriggerOffsetSeconds
+                )
             } else {
                 logger.warn { "Configuration file $absoluteFile doesn't contain valid configuration. Will ignore file!" }
                 null

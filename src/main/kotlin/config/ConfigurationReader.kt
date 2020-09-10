@@ -7,7 +7,8 @@ data class JobConfig(
     val cron: String,
     val resultWaitTimeoutMillis: Long,
     val tags: List<String>?,
-    val uniqueIds: List<String>?
+    val uniqueIds: List<String>?,
+    val randomTriggerOffsetSeconds: Long?
 )
 
 data class MongoDbConfig(
