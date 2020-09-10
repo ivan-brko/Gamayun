@@ -74,10 +74,10 @@ Consult with Log4j2 documentation for information on how to configure logging.
 Job configuration is specific for each job that needs to be run, and it consists of (at least) one file, which has a name that ends with _gamayun-job.config.toml_.
 
 In that file, the following properties are available: 
-* _**name**_: mandatory string field which is the name of the job. Each job needs to have a unique name or the application will not start ([***read the comment about path expansion](job-path-expansion-configuration))
-* _**pathToExecutable**_: mandatory string field which is the path to the executable that will be run when the job is triggered ([***read the comment about path expansion](job-path-expansion-configuration))
+* _**name**_: mandatory string field which is the name of the job. Each job needs to have a unique name or the application will not start ([***read the comment about path expansion](#job-path-expansion-configuration))
+* _**pathToExecutable**_: mandatory string field which is the path to the executable that will be run when the job is triggered ([***read the comment about path expansion](#job-path-expansion-configuration))
 * _**cronString**_: mandatory string which contains a valid cronstring. This cronstring defines the schedule for triggering the job. Quartz format for crons is used
-* _**arguments**_: optional string list which contains the arguments that will be given to the executable when running it ([***read the comment about path expansion](job-path-expansion-configuration)) 
+* _**arguments**_: optional string list which contains the arguments that will be given to the executable when running it ([***read the comment about path expansion](#job-path-expansion-configuration)) 
 * _**tags**_: optional string list which contains the tags to be associated with this job in the database
 * _**resultWaitTimeoutMillis**_: optional unsigned value which defines for how long the results for this job will be awaited before deciding that the job has failed (default is 1000)
 * _**uniqueIds**_: optional string list which defines what keys need to be unique for this task. For example, say you write a web scrapper which collects ads from some site. When running this crawler multiple times you will end up with some duplicate ads from different job runs. What you can do here is add a ```uniqueId = ["link"]``` and for each ad also store its link under this key. This will ensure that only one document in the database can have that link which means no duplicates will be stored, even though the crawler will report them. If you want to use multiple fields as keys, consult with MongoDB documentation (part about compound indexes). 
