@@ -1,5 +1,6 @@
 package supervision
 
+import errorReport.ErrorReporter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -9,7 +10,6 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import processing.ResultProcessor
 import storage.DataRepository
-import supervision.errorReport.ErrorReporter
 import java.io.IOException
 
 

@@ -1,4 +1,4 @@
-package supervision.errorReport
+package errorReport
 
 import config.ConfigurationReader
 import config.MailConfiguration
@@ -12,17 +12,24 @@ private val logger = KotlinLogging.logger {}
 
 class MailErrorReporter private constructor(private val mailConfiguration: MailConfiguration) : ErrorReporter {
     override fun reportErrorForJob(jobId: String, errorMessage: String?) {
+        sendEmail(
+            mailSubject = "Gamayun report for job $jobId",
+            mailBody = errorMessage ?: "Did not receive results for $jobId",
+        )
+    }
+
+    override fun reportGenericError(errorName: String, errorMessage: String?) {
+        sendEmail(mailSubject = errorName, mailBody = errorMessage ?: "")
+    }
+
+    private fun sendEmail(mailSubject: String, mailBody: String) {
         val email = EmailBuilder.startingBlank()
             .to(mailConfiguration.recipientName, mailConfiguration.recipientEmail)
             .from(mailConfiguration.senderName, mailConfiguration.senderEmail)
-            .withSubject("Gamayun report for job $jobId")
-            .withPlainText(errorMessage ?: "Did not receive results for $jobId")
+            .withSubject(mailSubject)
+            .withPlainText(mailBody)
             .buildEmail()
 
-        logger.warn {
-            "Sending email error report for job $jobId with error message $errorMessage " +
-                    "to ${mailConfiguration.recipientEmail} from ${mailConfiguration.senderEmail}"
-        }
 
         MailerBuilder.withSMTPServer(
             mailConfiguration.smtpHost,

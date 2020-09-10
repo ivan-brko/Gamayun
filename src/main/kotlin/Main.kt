@@ -1,8 +1,7 @@
-import config.ConfigurationReader
 import di.KodeinSetup.setupDi
 import mu.KotlinLogging
 import org.kodein.di.instance
-import scheduling.Scheduler
+import scheduling.GamayunInitializer
 
 
 fun main(args: Array<String>) {
@@ -12,10 +11,8 @@ fun main(args: Array<String>) {
         ?: throw IllegalArgumentException("Configuration Root (GAMAYUN_CONF_ROOT) env var not set")
 
     val kodein = setupDi(configurationRoot)
-    val scheduler: Scheduler by kodein.instance()
-    val configurationReader: ConfigurationReader by kodein.instance()
-
-    scheduler.scheduleJobs(configurationReader.readJobsConfiguration())
+    val gamayunInitializer: GamayunInitializer by kodein.instance()
+    gamayunInitializer.validateJobNamesAndCallScheduler()
 
     //todo: look if this can be implemented nicer in kotlin
     readLine()

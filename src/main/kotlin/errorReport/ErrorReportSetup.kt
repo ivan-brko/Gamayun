@@ -1,4 +1,4 @@
-package supervision.errorReport
+package errorReport
 
 import org.kodein.di.DI
 
