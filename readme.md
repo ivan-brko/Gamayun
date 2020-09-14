@@ -59,7 +59,7 @@ This configuration is about all the things that are not specific to a single job
 
 <a name="app-email-configuration"></a>
 #### Email configuration 
-Email configuration ATM is just a POC and it is verified to work only with gmail, this will be changed in the future so the configuration won't be explained in detail here as it is mostly self explanatory. Maybe the best approach to using this feature ATM is to create a new GMail account that will be used just for sending these error reports. If you plan to send reports from Gmail account you don't have to modify ```smtpHost``` and ```smtpPort``` fields. You also might need to configure Gmail account options to allow insecure 3pp apps.
+Email configuration ATM is just a POC and it is verified to work only with Gmail (mail can be sent to any domain, it is not tested that sending mail from any other domain but Gmail works), this will be changed in the future so the configuration won't be explained in detail here as it is mostly self explanatory. Maybe the best approach to using this feature ATM is to create a new Gmail account that will be used just for sending these error reports. If you plan to send reports from Gmail account you don't have to modify ```smtpHost``` and ```smtpPort``` fields. You also might need to configure Gmail account options to allow insecure 3pp apps.
 Email configuration should be stored in a file called _gamayun-email.config.toml_ and that file should be in the directory pointed to with envvar _GAMAYUN_CONF_ROOT_. You can see the sample of the file in the configuration example repo.
 <a name="app-mongo-configuration"></a> 
 #### MongoDB configuration
