@@ -9,12 +9,19 @@ buildscript{
     }
 }
 
+repositories {
+    mavenCentral()
+    jcenter()
+    maven("https://dl.bintray.com/arrow-kt/arrow-kt/")
+}
+
 plugins {
     kotlin("jvm") version "1.4.0"
     idea
     id("com.google.protobuf") version "0.8.8"
     kotlin("plugin.serialization") version "1.4.0"
     application
+    kotlin("kapt") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "6.0.0" //for fat-jar creation
 }
 
@@ -24,11 +31,6 @@ application {
 
 group = "org.gamayun"
 version = "0.2"
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -41,6 +43,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
     implementation("org.kodein.di:kodein-di:7.0.0")
     implementation("org.simplejavamail:simple-java-mail:6.4.3")
+
+    implementation("io.arrow-kt:arrow-core:0.10.5")
+    implementation("io.arrow-kt:arrow-syntax:0.10.5")
+    kapt ("io.arrow-kt:arrow-meta:0.10.5")
 
     implementation("com.google.protobuf:protobuf-java:3.6.1")
     implementation("com.google.protobuf:protobuf-java-util:3.6.1")

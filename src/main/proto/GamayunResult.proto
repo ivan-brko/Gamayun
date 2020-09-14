@@ -10,13 +10,21 @@ package gamayun;
 // The result service definition.
 service Result{
   // Reports a result to Gamayun
-  rpc ReportResult (TaskResult) returns (EmptyResponse) {}
+  rpc ReportResult (JobResult) returns (EmptyResponse) {}
+
+  // Reports an error to Gamayun
+  rpc ReportError (JobError) returns (EmptyResponse) {}
 }
 
 // Result containing jobName and Results
-message TaskResult {
-  string jobName = 1;
+message JobResult {
+  string name = 1;
   repeated string results = 2;
+}
+
+message JobError {
+  string name = 1;
+  string error = 2;
 }
 
 // The empty response

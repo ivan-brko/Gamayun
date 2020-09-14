@@ -1,5 +1,6 @@
 package supervision
 
+import arrow.core.Either
 import errorReport.ErrorReporter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -14,6 +15,8 @@ import java.io.IOException
 
 
 private val logger = KotlinLogging.logger {}
+
+//todo: rewrite this class, the code is ugly
 
 class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     private val listener: ResultListener by kodein.instance()
@@ -36,8 +39,16 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
         process.destroyAsync() //in case something is left hanging
 
         if (result != null) {
-            val documents = result.map { resultProcessor.toGamayunBson(it, taskConfig.tags) }
-            dataRepository.storeResult(taskConfig.name, documents)
+            when (result) {
+                is Either.Left -> {
+                    logger.warn { "Error reported for job ${taskConfig.name}\n${result.a}" }
+                    errorReporters.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
+                }
+                is Either.Right -> {
+                    val documents = result.b.map { resultProcessor.toGamayunBson(it, taskConfig.tags) }
+                    dataRepository.storeResult(taskConfig.name, documents)
+                }
+            }
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
             errorReporters.forEach { it.reportErrorForJob(taskConfig.name) }
