@@ -28,10 +28,13 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
         val executableWithArgs = taskConfig.toExecutableWithArgs()
 
         val process = withContext(Dispatchers.IO) {
-            ProcessBuilder(executableWithArgs)
+            val processBuilder = ProcessBuilder(executableWithArgs)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start() //this line doesn't block until program stops executing, only until program is started
+
+            processBuilder.environment()["GAMAYUN_JOB_NAME"] = taskConfig.name
+
+            processBuilder.start() //this line doesn't block until program stops executing, only until program is started
         }               //ignore the warning, this is wrapped in Dispatchers.IO so it's not a problem that it is blocking
 
         val result = listener.listenForResult(taskConfig.name, taskConfig.resultWaitTimeoutMillis)
