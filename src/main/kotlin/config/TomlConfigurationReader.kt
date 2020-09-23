@@ -139,6 +139,6 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
             .filter { it.name == "gamayun-email.config.toml" }
             .firstOrNull()
             ?.also { logger.debug { "Found an email configuration file: ${it.absoluteFile}" } }
-            ?.let { it.parseEmailFile() } ?: throw IllegalArgumentException("No valid email configuration!")
+            ?.let { it.parseEmailFile() } ?: ErrorReportConfig(mailConfiguration = null)
     }
 }
