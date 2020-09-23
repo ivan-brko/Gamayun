@@ -89,9 +89,10 @@ In that file, the following properties are available:
 
 <a name="job-result-report"></a>
 ## Reporting the result of a job
-Results of the jobs are reported to Gamayun over GRPC. Gamayun is listening on localhost, port 16656. Proto file used for reporting result can be found under resources in the project. The sample project has example scripts which report results to the server. 
+Results of the jobs are reported to Gamayun over GRPC. Gamayun is listening on localhost, port 16656. Proto file used for reporting result can be found under _resources_ in the project. The sample project has example scripts which report results to the server.
+There is also an option to return error from the job if something goes wrong. 
 
-To simplify job reports and remove explicit dependency on GRPC for the user of the application, python package will be added which will contain a simple API for reporting results. Also, in the future there will be an option to return errors so that error messages get more informative. At the moment, nothing should be return in case of error and the job should just timeout.
+If you plan to use Python scripts for gamayun-jobs, there is a ```pip``` package that simplifies writing the script logic. Checkout the [GamayunPython package repo](https://github.com/ivan-brko/GamayunPyUtils) or examples in [Gamayun sample configuration repository](https://github.com/ivan-brko/GamayunConfigurationSample).
 
 <a name="license"></a>
 ## License
