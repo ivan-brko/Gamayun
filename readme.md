@@ -4,6 +4,7 @@ Gamayun is an application intended to ease data collection processes.
 
 ## Contents
 * [Basic idea](#basic-idea)
+* [TLDR usage](#tldr-usage)
 * [Name](#name)
 * [Usage](#usage)
   * [Docker prerequisites](#docker-prereqs)
@@ -21,11 +22,17 @@ Gamayun is an application intended to ease data collection processes.
 
 <a name="basic-idea"></a>
 ## Basic idea
-The idea behind the application is simplification of data collection. To start collecting some new data only the minimal code needed for data collection should be written (for example a python script that collects the data). Everything else (triggering the script at wanted times, storing the data somewhere, error notifications in case of errors while collecting...) is handled by Gamayun.
+The idea behind the application is simplification of data collection. To start collecting some new data, only the minimal code needed for data collection should be written (for example a python script that collects the data). Everything else (triggering the script at wanted times, storing the data somewhere, error notifications in case of errors while collecting...) is handled by Gamayun.
 
-Most important concept in Gamayun is job, or gamayun-job, and using the Gamayun basically means writing the configuration for all the jobs you need and then running the application with that configuration. An example of a gamayun-job would be collecting some system resources data every morning at 7AM, or scrapping some website every ten minutes. More information about job configuration can be found [here](#configuration).
+Most important concept in Gamayun is job, or gamayun-job, and using the Gamayun basically means writing the configuration for all the jobs you need and then running the application with that configuration. An example of a gamayun-job would be collecting some system resources data every morning at 7AM, or scraping some website every ten minutes. More information about job configuration can be found [here](#configuration).
 
 If you are not too sure you understand how the application works after reading this documentation, check the sample configuration project which is well commented and documented (can be found [here](https://github.com/ivan-brko/GamayunConfigurationSample)).     
+
+<a name="tldr-usage"></a>
+## TLDR Usage
+If you are comfortable with ```docker``` and ```docker-compose``` and just want to start collecting data, you don't even need this repository, clone [ConfigurationSample](https://github.com/ivan-brko/GamayunConfigurationSample). 
+There you will find an example of Gamayun application configuration and two example jobs (scraping _Hackernews_ and _r/programming_), everything well-commented. 
+Just run ```docker-compose up``` in the root of that repository to get things running. You can use that repo as a base for your own configuration.
 
 <a name="name"></a>
 ## Name 
