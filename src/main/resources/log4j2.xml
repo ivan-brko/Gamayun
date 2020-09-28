@@ -5,8 +5,8 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
         <RollingFile name="RollingFile">
-            <FileName>/log/gamayun/gamayun.log</FileName>
-            <FilePattern>/log/gamayun/%d{yyyy-MM-dd-hh}-%i.log.zip</FilePattern>
+            <FileName>/logs/gamayun/gamayun.log</FileName>
+            <FilePattern>/logs/gamayun/%d{yyyy-MM-dd-hh}-%i.log.zip</FilePattern>
             <PatternLayout>
                 <Pattern>%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
