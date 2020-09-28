@@ -23,7 +23,7 @@ Gamayun is an application intended to ease data collection processes.
 ## Basic idea
 The idea behind the application is simplification of data collection. To start collecting some new data only the minimal code needed for data collection should be written (for example a python script that collects the data). Everything else (triggering the script at wanted times, storing the data somewhere, error notifications in case of errors while collecting...) is handled by Gamayun.
 
-Most important concept in Gamayun is job, or gamayun-job, and using the Gamayun basically means writing the configuration for all the jobs you need and then running the application with that configuration. An example of a gamayun-job would be collecting some system resources data every morning at 7AM, or scrapping some website every ten minutes. More information about job configuration can be found in TODO.
+Most important concept in Gamayun is job, or gamayun-job, and using the Gamayun basically means writing the configuration for all the jobs you need and then running the application with that configuration. An example of a gamayun-job would be collecting some system resources data every morning at 7AM, or scrapping some website every ten minutes. More information about job configuration can be found [here](#configuration).
 
 If you are not too sure you understand how the application works after reading this documentation, check the sample configuration project which is well commented and documented (can be found [here](https://github.com/ivan-brko/GamayunConfigurationSample)).     
 
@@ -34,6 +34,7 @@ Gamayun is a prophetic bird of Slavic folklore, a symbol of wisdom and knowledge
 <a name="usage"></a>
 ## Usage
 Although you can clone this project, build it and use it like that, the easiest way to set things up is with Docker.
+In fact, if you just want to use Gamayun, this repository is not even necessary (except for documentation in _readme.md_) as there is a Docker image for Gamayun application which you can use.  
 
 <a name="docker-prereqs"></a>
 ### Docker prerequisites 
@@ -41,7 +42,9 @@ If you don't know anything about Docker, there is a small tutorial on how the th
 
 <a name="docker-usage"></a>
 ### Docker usage
-There is a sample repo which shows how to set configuration and then easily deploy it with Docker and it can be found [here](https://github.com/ivan-brko/GamayunConfigurationSample).
+There is a sample repo which shows how to set configuration and then easily deploy it with Docker and it can be found [here](https://github.com/ivan-brko/GamayunConfigurationSample). 
+
+Following is a brief explanation of usage with Docker, more information can be found in the mentioned configuration sample.
 
 This sample can be used as a base for building a new Gamayun configuration. The TLDR is to create a repo which contains Gamayun configuration in valid format, create a Docker image (let's call this the configuration image) with Gamayun as the base image. In that configuration image just copy the entire configuration and set environment variable to point to the location where the configuration is stored in the container. After that, using docker-compose we run this image and MongoDB as two containers and that should be it, Gamayun should be running and storing the data into MongoDB.   
 Note that you should change the MongoDB credentials to something more secure from what is set in the sample repo.
