@@ -34,6 +34,8 @@ If you are comfortable with ```docker``` and ```docker-compose``` and just want 
 There you will find an example of Gamayun application configuration and two example jobs (scraping _Hackernews_ and _r/programming_), everything well-commented. 
 Just run ```docker-compose up``` in the root of that repository to get things running. You can use that repo as a base for your own configuration.
 
+Note that if you want to run Gamayun on Raspberry PI (or any arm64v8) you need to run ```docker-compose -f arm64v8.docker-compose.yml up``` to use correct image versions.
+
 <a name="name"></a>
 ## Name 
 Gamayun is a prophetic bird of Slavic folklore, a symbol of wisdom and knowledge.
@@ -59,7 +61,7 @@ Also, note that this sample doesn't expose the MongoDB container directly, so yo
 
 <a name="configuration"></a>
 ## Configuration
-There are two basic parts of Gamayun configuration:
+There are two basic parts of Gamayun configuration, application configuration and job configuration.
 <a name="app-configuration"></a>
 ### Application configuration
 This configuration is about all the things that are not specific to a single job and at the moment the following is supported:
@@ -102,7 +104,7 @@ In that file, the following properties are available:
 Results of the jobs are reported to Gamayun over GRPC. Gamayun is listening on localhost, port 16656. Proto file used for reporting result can be found under _resources_ in the project. The sample project has example scripts which report results to the server.
 There is also an option to return error from the job if something goes wrong. 
 
-If you plan to use Python scripts for gamayun-jobs, there is a ```pip``` package that simplifies writing the script logic. Checkout the [GamayunPython package repo](https://github.com/ivan-brko/GamayunPyUtils) or examples in [Gamayun sample configuration repository](https://github.com/ivan-brko/GamayunConfigurationSample).
+If you plan to use Python scripts for gamayun-jobs, there is a ```pip``` package that simplifies writing the script logic. Checkout the [GamayunPython package repo](https://github.com/ivan-brko/GamayunPyUtils) or examples in [Gamayun sample configuration repository](https://github.com/ivan-brko/GamayunConfigurationSample). There is also a [prebuilt Docker image containing Gamayun and Gamayun python utils](https://hub.docker.com/repository/docker/ibrko/gamayun_py_utils).
 
 <a name="license"></a>
 ## License
