@@ -1,7 +1,7 @@
 package supervision
 
 import arrow.core.Either
-import errorReport.ErrorReporter
+import notification.Notifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -21,7 +21,7 @@ private val logger = KotlinLogging.logger {}
 class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     private val listener: ResultListener by kodein.instance()
     private val dataRepository: DataRepository by kodein.instance()
-    private val errorReporters: List<ErrorReporter> by kodein.instance()
+    private val notifiers: List<Notifier> by kodein.instance()
     private val resultProcessor: ResultProcessor by kodein.instance()
 
     override suspend fun runTask(taskConfig: TaskConfig) = try {
@@ -29,8 +29,8 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
 
         val process = withContext(Dispatchers.IO) {
             val processBuilder = ProcessBuilder(executableWithArgs)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectError(ProcessBuilder.Redirect.PIPE)
 
             processBuilder.environment()["GAMAYUN_JOB_NAME"] = taskConfig.name
 
@@ -45,7 +45,7 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
             when (result) {
                 is Either.Left -> {
                     logger.warn { "Error reported for job ${taskConfig.name}\n${result.a}" }
-                    errorReporters.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
+                    notifiers.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
                 }
                 is Either.Right -> {
                     val documents = result.b.map { resultProcessor.toGamayunBson(it, taskConfig.tags) }
@@ -54,7 +54,7 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
             }
         } else {
             logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
-            errorReporters.forEach { it.reportErrorForJob(taskConfig.name) }
+            notifiers.forEach { it.reportErrorForJob(taskConfig.name) }
         }
 
     } catch (e: IOException) {
@@ -62,13 +62,13 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     }
 
     private fun TaskConfig.toExecutableWithArgs(): List<String> =
-        mutableListOf<String>().run {
-            add(pathToExe)
-            if (args != null) {
-                addAll(args)
+            mutableListOf<String>().run {
+                add(pathToExe)
+                if (args != null) {
+                    addAll(args)
+                }
+                toList()
             }
-            toList()
-        }
 
     private suspend fun Process.destroyAsync() {
         coroutineScope {

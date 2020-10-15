@@ -2,8 +2,8 @@ package di
 
 import config.ConfigurationReader
 import config.TomlConfigurationReader
-import errorReport.ErrorReportSetup.setupErrorSupport
-import errorReport.ErrorReporter
+import notification.NotificationSetup.setupNotificationSupport
+import notification.Notifier
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
@@ -19,17 +19,17 @@ import supervision.*
 
 object KodeinSetup {
     fun setupDi(tomlConfigurationRoot: String) =
-        DI {
-            bind<ConfigurationReader>() with singleton { TomlConfigurationReader(tomlConfigurationRoot) }
-            bind<ResultProcessor>() with singleton { SimpleResultProcessor() }
-            bind<Scheduler>() with singleton { QuartzScheduler(di) }
-            bind<GamayunInitializer>() with singleton { GamayunInitializer(di) }
-            bind<MongoDbSettings>() with singleton { MongoDbSettings(di) }
-            bind<DataRepository>() with singleton { MongoDataRepository(di) }
-            bind<ResultListener>() with singleton { GamayunGrpcResultListener(GrpcResultServer()) }
-            bind<List<ErrorReporter>>() with singleton { setupErrorSupport(di) }
-            bind<TaskSupervisor>() with singleton { BasicTaskSupervisor(di) }
-        }
+            DI {
+                bind<ConfigurationReader>() with singleton { TomlConfigurationReader(tomlConfigurationRoot) }
+                bind<ResultProcessor>() with singleton { SimpleResultProcessor() }
+                bind<Scheduler>() with singleton { QuartzScheduler(di) }
+                bind<GamayunInitializer>() with singleton { GamayunInitializer(di) }
+                bind<MongoDbSettings>() with singleton { MongoDbSettings(di) }
+                bind<DataRepository>() with singleton { MongoDataRepository(di) }
+                bind<ResultListener>() with singleton { GamayunGrpcResultListener(GrpcResultServer()) }
+                bind<List<Notifier>>() with singleton { setupNotificationSupport(di) }
+                bind<TaskSupervisor>() with singleton { BasicTaskSupervisor(di) }
+            }
 
 
 }

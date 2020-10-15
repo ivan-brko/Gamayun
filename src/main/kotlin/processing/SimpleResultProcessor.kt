@@ -15,36 +15,36 @@ class SimpleResultProcessor : ResultProcessor {
     }
 
     private fun String.toJson(): JsonElement? =
-        try {
-            Json(JsonConfiguration.Stable).parseJson(this) //this will throw if it is not json
-        } catch (e: Exception) {
-            null
-        }
+            try {
+                Json(JsonConfiguration.Stable).parseJson(this) //this will throw if it is not json
+            } catch (e: Exception) {
+                null
+            }
 
     private fun JsonElement.toBsonDocument(): BsonDocument =
-        BsonDocument().also { bsonDocument ->
-            if (this is JsonObject) {
-                val jsonObject = this.jsonObject
-                jsonObject.forEach {
-                    val key = it.component1()
-                    val jsonElement = it.component2().primitive.contentOrNull
-                    if (jsonElement != null) {
-                        bsonDocument[key] = BsonString(jsonElement)
-                    } else {
-                        bsonDocument[key] = BsonNull()
+            BsonDocument().also { bsonDocument ->
+                if (this is JsonObject) {
+                    val jsonObject = this.jsonObject
+                    jsonObject.forEach {
+                        val key = it.component1()
+                        val jsonElement = it.component2().primitive.contentOrNull
+                        if (jsonElement != null) {
+                            bsonDocument[key] = BsonString(jsonElement)
+                        } else {
+                            bsonDocument[key] = BsonNull()
+                        }
                     }
+                } else if (this is JsonPrimitive) {
+                    val jsonElement = this.primitive.contentOrNull
+                    bsonDocument["body"] = BsonString(jsonElement)
                 }
-            } else if (this is JsonPrimitive) {
-                val jsonElement = this.primitive.contentOrNull
-                bsonDocument["body"] = BsonString(jsonElement)
             }
-        }
 
 
     private fun String.toBsonDocument(): BsonDocument =
-        BsonDocument().also { bsonDocument ->
-            bsonDocument["body"] = BsonString(this)
-        }
+            BsonDocument().also { bsonDocument ->
+                bsonDocument["body"] = BsonString(this)
+            }
 
     private fun BsonDocument.addGamayunMetadata(tags: List<String>) {
         this["gamayunTimestamp"] = BsonDateTime(System.currentTimeMillis())

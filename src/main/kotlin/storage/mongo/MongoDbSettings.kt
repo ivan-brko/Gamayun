@@ -11,7 +11,7 @@ class MongoDbSettings(kodein: DI) {
 
     private val mongoConfig by lazy {
         configurationReader.readDatabaseConfiguration().mongodb
-            ?: throw IllegalArgumentException("Mongo config not present")
+                ?: throw IllegalArgumentException("Mongo config not present")
     }
 
     val mongoClient by lazy {

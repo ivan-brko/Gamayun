@@ -2,7 +2,7 @@ package scheduling
 
 import config.ConfigurationReader
 import config.JobConfig
-import errorReport.ErrorReporter
+import notification.Notifier
 import mu.KotlinLogging
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -11,14 +11,19 @@ import kotlin.system.exitProcess
 private val logger = KotlinLogging.logger {}
 
 class GamayunInitializer(kodein: DI) {
-    val scheduler: Scheduler by kodein.instance()
+    private val scheduler: Scheduler by kodein.instance()
     val configurationReader: ConfigurationReader by kodein.instance()
-    private val errorReporters: List<ErrorReporter> by kodein.instance()
+    private val notifiers: List<Notifier> by kodein.instance()
 
-    fun validateJobNamesAndCallScheduler() {
+    fun scheduleJobsAndHeartbeat() {
         val jobs = configurationReader.readJobsConfiguration()
+        val applicationConfiguration = configurationReader.readApplicationConfiguration()
         validateJobNamesOrKillApplication(jobs)
         scheduler.scheduleJobs(jobs)
+        if (applicationConfiguration.heartbeatPeriodInSeconds != null) {
+            scheduler.scheduleHeartbeat(applicationConfiguration.heartbeatPeriodInSeconds)
+        }
+        scheduler.startRunningTasks()
     }
 
     private fun validateJobNamesOrKillApplication(jobs: List<JobConfig>) {
@@ -27,7 +32,7 @@ class GamayunInitializer(kodein: DI) {
             val duplicateJobNames = groupedJobs.filter { it.value.size > 1 }.map { it.key }
             val errorMessage = "The following names are duplicates: $duplicateJobNames"
             logger.error { "Invalid job configuration, duplicate names present, will kill application!\n$errorMessage" }
-            errorReporters.forEach {
+            notifiers.forEach {
                 it.reportGenericError("Invalid job configuration, duplicate job names", errorMessage)
             }
             exitProcess(1)
