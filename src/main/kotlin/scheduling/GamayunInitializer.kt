@@ -2,8 +2,8 @@ package scheduling
 
 import config.ConfigurationReader
 import config.JobConfig
-import notification.Notifier
 import mu.KotlinLogging
+import notification.Notifier
 import org.kodein.di.DI
 import org.kodein.di.instance
 import kotlin.system.exitProcess

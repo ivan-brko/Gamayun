@@ -1,7 +1,11 @@
 package processing
 
-import org.bson.BsonDocument
+data class ProcessedGamayunResult(
+        val stringData: Map<String, String>,
+        val stringListData: Map<String, List<String>>
+)
 
 interface ResultProcessor {
-    fun toGamayunBson(data: String, tags: List<String>?): BsonDocument
+    fun processRawResults(data: String, tags: List<String>?): ProcessedGamayunResult
+    fun processMapResults(data: Map<String, String>, tags: List<String>?): ProcessedGamayunResult
 }

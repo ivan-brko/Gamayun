@@ -1,7 +1,7 @@
 package storage
 
-import org.bson.BsonDocument
+import processing.ProcessedGamayunResult
 
 interface DataRepository {
-    suspend fun storeResult(jobId: String, result: List<BsonDocument>)
+    suspend fun storeResult(jobId: String, result: List<ProcessedGamayunResult>)
 }

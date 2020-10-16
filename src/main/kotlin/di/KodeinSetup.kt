@@ -7,8 +7,8 @@ import notification.Notifier
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
+import processing.BasicResultProcessor
 import processing.ResultProcessor
-import processing.SimpleResultProcessor
 import scheduling.GamayunInitializer
 import scheduling.QuartzScheduler
 import scheduling.Scheduler
@@ -21,7 +21,7 @@ object KodeinSetup {
     fun setupDi(tomlConfigurationRoot: String) =
             DI {
                 bind<ConfigurationReader>() with singleton { TomlConfigurationReader(tomlConfigurationRoot) }
-                bind<ResultProcessor>() with singleton { SimpleResultProcessor() }
+                bind<ResultProcessor>() with singleton { BasicResultProcessor() }
                 bind<Scheduler>() with singleton { QuartzScheduler(di) }
                 bind<GamayunInitializer>() with singleton { GamayunInitializer(di) }
                 bind<MongoDbSettings>() with singleton { MongoDbSettings(di) }

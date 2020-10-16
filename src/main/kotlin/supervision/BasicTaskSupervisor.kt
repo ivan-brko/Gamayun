@@ -1,12 +1,12 @@
 package supervision
 
 import arrow.core.Either
-import notification.Notifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import notification.Notifier
 import org.kodein.di.DI
 import org.kodein.di.instance
 import processing.ResultProcessor
@@ -48,8 +48,11 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
                     notifiers.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
                 }
                 is Either.Right -> {
-                    val documents = result.b.map { resultProcessor.toGamayunBson(it, taskConfig.tags) }
-                    dataRepository.storeResult(taskConfig.name, documents)
+                    val processedRawData = result.b.rawResults.map { resultProcessor.processRawResults(it, taskConfig.tags) }
+                    val processedMapData = result.b.mapResults.map { resultProcessor.processMapResults(it, taskConfig.tags) }
+                    val allProcessedData = processedMapData + processedRawData
+
+                    dataRepository.storeResult(taskConfig.name, allProcessedData)
                 }
             }
         } else {
