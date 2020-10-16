@@ -4,6 +4,15 @@ data class ApplicationConfiguration(
         val heartbeatPeriodInSeconds: Long?
 )
 
+enum class OnDuplicateEntry {
+    IGNORE_NEW, STORE_NEW, TRACK_CHANGES
+}
+
+data class JobDuplicateEntryPolicy(
+        val uniqueIds: List<String>?,
+        val onDuplicateEntry: OnDuplicateEntry
+)
+
 data class JobConfig(
         val name: String,
         val pathToExecutable: String,
@@ -11,7 +20,7 @@ data class JobConfig(
         val cron: String,
         val resultWaitTimeoutMillis: Long,
         val tags: List<String>?,
-        val uniqueIds: List<String>?,
+        val jobDuplicateEntryPolicy: JobDuplicateEntryPolicy?,
         val randomTriggerOffsetSeconds: Long?
 )
 

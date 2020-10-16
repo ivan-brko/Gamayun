@@ -1,6 +1,7 @@
 package supervision
 
 import config.JobConfig
+import config.JobDuplicateEntryPolicy
 
 data class TaskConfig(
         val name: String,
@@ -8,11 +9,11 @@ data class TaskConfig(
         val args: List<String>?,
         val resultWaitTimeoutMillis: Long,
         val tags: List<String>?,
-        val uniqueIds: List<String>?
+        val duplicateEntryPolicy: JobDuplicateEntryPolicy?
 )
 
 fun JobConfig.toTaskConfig() =
-        TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis, tags, uniqueIds)
+        TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis, tags, jobDuplicateEntryPolicy)
 
 interface TaskSupervisor {
     suspend fun runTask(taskConfig: TaskConfig)
