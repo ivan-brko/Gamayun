@@ -20,22 +20,15 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
 
                 return if (neededTomlValues.all { parsedToml.contains(it) }) {
                     val name = parsedToml.getString("name").replaceConfigurationFilePathPlaceholder(pathToConfig)
-
                     val exePath =
                             parsedToml.getString("pathToExecutable").replaceConfigurationFilePathPlaceholder(pathToConfig)
-
                     val cronString = parsedToml.getString("cronString")
-
                     val arguments = parsedToml.getList<String>("arguments")
                             ?.map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
-
                     val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis") ?: 5000
-
                     val randomTriggerOffsetSeconds = parsedToml.getLong("randomTriggerOffsetSeconds")
-
                     val tags = parsedToml.getList<String>("tags")
-
-                    val uniqueIds = parsedToml.getList<String>("uniqueIds")
+                    val duplicateEntryPolicy = parsedToml.getDuplicateEntryPolicy()
 
                     JobConfig(
                             name,
@@ -44,11 +37,29 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
                             cronString,
                             resultWaitTimeoutMillis,
                             tags,
-                            uniqueIds,
+                            duplicateEntryPolicy,
                             randomTriggerOffsetSeconds
                     )
                 } else {
                     logger.warn { "Configuration file $absoluteFile doesn't contain valid configuration. Will ignore file!" }
+                    null
+                }
+            }
+
+    private fun Toml.getDuplicateEntryPolicy(): JobDuplicateEntryPolicy? =
+            getTable("duplicateEntryPolicy")?.let { table ->
+                val uniqueIds: List<String>? = table.getList<String>("uniqueIds")
+                val onDuplicateEntry: OnDuplicateEntry? = table.getString("onDuplicateEntry")?.let { onDupEntryString ->
+                    when (onDupEntryString) {
+                        "IGNORE_NEW" -> OnDuplicateEntry.IGNORE_NEW
+                        "STORE_NEW" -> OnDuplicateEntry.STORE_NEW
+                        "TRACK_CHANGES" -> OnDuplicateEntry.TRACK_CHANGES
+                        else -> null
+                    }
+                }
+                if (uniqueIds != null && onDuplicateEntry != null) {
+                    JobDuplicateEntryPolicy(uniqueIds, onDuplicateEntry)
+                } else {
                     null
                 }
             }
