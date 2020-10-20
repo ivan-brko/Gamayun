@@ -10,4 +10,6 @@ RUN mkdir /app
 
 COPY --from=build /home/gradle/src/build/libs/ /app/
 
-ENTRYPOINT ["java","-jar","/app/Gamayun-0.2-all.jar"]
+EXPOSE 21663
+
+ENTRYPOINT ["java","-jar","/app/Gamayun-0.2.1-all.jar"]

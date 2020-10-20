@@ -119,6 +119,7 @@ Supported endpoints:
 * GET @ _/configuration/reloadConfiguration_: reloads configuration, allowing insertion of new jobs without restarting the application
 * GET @ _/metadata/version_ : returns the version of Gamayun
 
+Default port is 21663.
 
 <a name="license"></a>
 ## License
