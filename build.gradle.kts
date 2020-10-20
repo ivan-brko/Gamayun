@@ -30,7 +30,7 @@ application {
 }
 
 group = "org.gamayun"
-version = "0.2"
+version = "0.2.1"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))

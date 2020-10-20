@@ -17,6 +17,7 @@ Gamayun is an application intended to ease data collection processes.
   * [Job Configuration](#job-configuration)
     * [Path expansion](#job-path-expansion-configuration)
 * [Reporting the result of a job](#job-result-report)
+* [REST API](#rest-api)
 * [License](#license)
 * [Contributing](#contributing)
 
@@ -92,8 +93,13 @@ In that file, the following properties are available:
 * _**arguments**_: optional string list which contains the arguments that will be given to the executable when running it ([***read the comment about path expansion](#job-path-expansion-configuration)) 
 * _**tags**_: optional string list which contains the tags to be associated with this job in the database
 * _**resultWaitTimeoutMillis**_: optional unsigned value which defines for how long the results for this job will be awaited before deciding that the job has failed (default is 1000)
-* _**uniqueIds**_: optional string list which defines what keys need to be unique for this task. For example, say you write a web scrapper which collects ads from some site. When running this crawler multiple times you will end up with some duplicate ads from different job runs. What you can do here is add a ```uniqueId = ["link"]``` and for each ad also store its link under this key. This will ensure that only one document in the database can have that link which means no duplicates will be stored, even though the crawler will report them. If you want to use multiple fields as keys, consult with MongoDB documentation (part about compound indexes). 
 * **_randomTriggerOffsetSeconds_**: optional unsigned value which defines the random interval (in seconds) in which the job will be run after the next trigger by cron is hit (default is 0). For example, if you set cron to run the job every day at 07:00 PM and set _randomTriggerOffsetSeconds_ to 60, then the job will run each day somewhere between 7:00 PM and 7:01 PM.
+* _**duplicateEntryPolicy**_: optional TOML table which contains intstructions on what to do with duplicate entries. For example, say you write a web scrapper which collects ads from some site. When running this crawler multiple times you will end up with some duplicate ads from different job runs. If you don't configure this table in the configuration, Gamayun will not understand that these are the same ads and it will store them as separate, unrelated documents in the repository. This table allows you to configure how to handle these cases. There are two properties in the table: 
+  * _**uniqueIds**_: string list which defines what keys need to match for two documents to be considered duplicates. For example, if you decide that two documents represent the same ad if they have the same ```link``` key present, you would set ```uniqueId = ["link"]```.
+  * _**onDuplicateEntry**_: Defines what policy to use for duplicate entries for this job. There are three available options: 
+    * _IGNORE_NEW_: this policy will simply ignore any incoming duplicates in the repository
+    * _STORE_NEW_: this policy will always store the latest version of the document
+    * _TRACK_CHANGES_: this policy is still work in progress! It allows tracking the entire history of changes for a document  
 
 <a name="job-path-expansion-configuration"></a>
 #### Path expansion
@@ -105,6 +111,14 @@ Results of the jobs are reported to Gamayun over GRPC. Gamayun is listening on l
 There is also an option to return error from the job if something goes wrong. 
 
 If you plan to use Python scripts for gamayun-jobs, there is a ```pip``` package that simplifies writing the script logic. Checkout the [GamayunPython package repo](https://github.com/ivan-brko/GamayunPyUtils) or examples in [Gamayun sample configuration repository](https://github.com/ivan-brko/GamayunConfigurationSample). There is also a [prebuilt Docker image containing Gamayun and Gamayun python utils](https://hub.docker.com/repository/docker/ibrko/gamayun_py_utils).
+
+<a name="rest-api"></a>
+## REST API
+Gamayun supports a REST API for communication with the application while it is running. This API is basic at the moment, in the future a client application will use it and make giving commands to Gamayun simpler.
+Supported endpoints:
+* _/configuration/reloadConfiguration_: reloads configuration, allowing insertion of new jobs without restarting the application
+* _/metadata/version_ : returns the version of Gamayun
+
 
 <a name="license"></a>
 ## License
