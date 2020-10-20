@@ -116,8 +116,8 @@ If you plan to use Python scripts for gamayun-jobs, there is a ```pip``` package
 ## REST API
 Gamayun supports a REST API for communication with the application while it is running. This API is basic at the moment, in the future a client application will use it and make giving commands to Gamayun simpler.
 Supported endpoints:
-* _/configuration/reloadConfiguration_: reloads configuration, allowing insertion of new jobs without restarting the application
-* _/metadata/version_ : returns the version of Gamayun
+* GET @ _/configuration/reloadConfiguration_: reloads configuration, allowing insertion of new jobs without restarting the application
+* GET @ _/metadata/version_ : returns the version of Gamayun
 
 
 <a name="license"></a>
