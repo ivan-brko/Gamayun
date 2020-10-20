@@ -29,8 +29,8 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
 
         val process = withContext(Dispatchers.IO) {
             val processBuilder = ProcessBuilder(executableWithArgs)
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
 
             processBuilder.environment()["GAMAYUN_JOB_NAME"] = taskConfig.name
 
@@ -48,8 +48,10 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
                     notifiers.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
                 }
                 is Either.Right -> {
-                    val processedRawData = result.b.rawResults.map { resultProcessor.processRawResults(it, taskConfig.tags) }
-                    val processedMapData = result.b.mapResults.map { resultProcessor.processMapResults(it, taskConfig.tags) }
+                    val processedRawData =
+                        result.b.rawResults.map { resultProcessor.processRawResults(it, taskConfig.tags) }
+                    val processedMapData =
+                        result.b.mapResults.map { resultProcessor.processMapResults(it, taskConfig.tags) }
                     val allProcessedData = processedMapData + processedRawData
 
                     dataRepository.storeResult(taskConfig.name, allProcessedData)
@@ -65,13 +67,13 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
     }
 
     private fun TaskConfig.toExecutableWithArgs(): List<String> =
-            mutableListOf<String>().run {
-                add(pathToExe)
-                if (args != null) {
-                    addAll(args)
-                }
-                toList()
+        mutableListOf<String>().run {
+            add(pathToExe)
+            if (args != null) {
+                addAll(args)
             }
+            toList()
+        }
 
     private suspend fun Process.destroyAsync() {
         coroutineScope {

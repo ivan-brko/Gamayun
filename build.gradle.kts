@@ -19,14 +19,14 @@ plugins {
     kotlin("jvm") version "1.4.0"
     idea
     id("com.google.protobuf") version "0.8.8"
-    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("plugin.serialization") version "1.4.10"
     application
     kotlin("kapt") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "6.0.0" //for fat-jar creation
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClassName = "io.ktor.server.netty.EngineMain"
 }
 
 group = "org.gamayun"
@@ -34,13 +34,20 @@ version = "0.2"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("io.ktor:ktor-server-netty:1.4.1")
+//    implementation("ch.qos.logback:logback-classic:1.2.1")
+    implementation("io.ktor:ktor-locations:1.4.1")
+    implementation("io.ktor:ktor-auth:1.4.1")
+    implementation("io.ktor:ktor-auth-jwt:1.4.1")
+    implementation("io.ktor:ktor-serialization:1.4.1")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7")
     implementation("org.quartz-scheduler:quartz:2.3.2")
     implementation("io.github.microutils:kotlin-logging:1.8.3")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
     implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.0.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:1.0-M1-1.4.0-rc")
     implementation("org.kodein.di:kodein-di:7.0.0")
     implementation("org.simplejavamail:simple-java-mail:6.4.3")
 

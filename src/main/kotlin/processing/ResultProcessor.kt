@@ -1,8 +1,8 @@
 package processing
 
 data class ProcessedGamayunResult(
-        val stringData: Map<String, String>,
-        val stringListData: Map<String, List<String>>
+    val stringData: Map<String, String>,
+    val stringListData: Map<String, List<String>>
 )
 
 interface ResultProcessor {

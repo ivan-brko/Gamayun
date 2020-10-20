@@ -4,6 +4,8 @@ import config.ConfigurationReader
 import config.JobConfig
 import mu.KotlinLogging
 import notification.Notifier
+import observable.ObservableEvent
+import observable.ObservableEventNotifier
 import org.kodein.di.DI
 import org.kodein.di.instance
 import kotlin.system.exitProcess
@@ -12,13 +14,21 @@ private val logger = KotlinLogging.logger {}
 
 class GamayunInitializer(kodein: DI) {
     private val scheduler: Scheduler by kodein.instance()
-    val configurationReader: ConfigurationReader by kodein.instance()
+    private val configurationReader: ConfigurationReader by kodein.instance()
     private val notifiers: List<Notifier> by kodein.instance()
+    private val observableEventNotifier: ObservableEventNotifier by kodein.instance()
+
+    init {
+        observableEventNotifier.subscribeToEvent(ObservableEvent.CONFIGURATION_RESTART) {
+            scheduleJobsAndHeartbeat()
+        }
+    }
 
     fun scheduleJobsAndHeartbeat() {
         val jobs = configurationReader.readJobsConfiguration()
         val applicationConfiguration = configurationReader.readApplicationConfiguration()
         validateJobNamesOrKillApplication(jobs)
+        scheduler.deleteAllScheduledTasks()
         scheduler.scheduleJobs(jobs)
         if (applicationConfiguration.heartbeatPeriodInSeconds != null) {
             scheduler.scheduleHeartbeat(applicationConfiguration.heartbeatPeriodInSeconds)

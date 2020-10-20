@@ -8,6 +8,8 @@ import config.JobDuplicateEntryPolicy
 import config.OnDuplicateEntry
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import observable.ObservableEvent
+import observable.ObservableEventNotifier
 import org.bson.BsonArray
 import org.bson.BsonDocument
 import org.bson.BsonString
@@ -22,27 +24,47 @@ private val logger = KotlinLogging.logger {}
 class MongoDataRepository(kodein: DI) : DataRepository {
     private val configurationReader: ConfigurationReader by kodein.instance()
     private val mongoDbSettings: MongoDbSettings by kodein.instance()
+    private val observableEventNotifier: ObservableEventNotifier by kodein.instance()
 
     init {
         runBlocking {
-            val jobs = configurationReader.readJobsConfiguration()
-            jobs.forEach { jobConfig ->
-                if (jobConfig.jobDuplicateEntryPolicy?.uniqueIds != null) {
-                    logger.info("Creating unique index for collection ${jobConfig.name}. Indices are: ${jobConfig.jobDuplicateEntryPolicy.uniqueIds}")
-                    val collection = mongoDbSettings.database.getCollection<BsonDocument>(jobConfig.name)
-                    collection.createIndex(Indexes.ascending(jobConfig.jobDuplicateEntryPolicy.uniqueIds), IndexOptions().unique(true))
-                }
+            createUniqueIndexes()
+        }
+
+        observableEventNotifier.subscribeToEvent(ObservableEvent.CONFIGURATION_RESTART) {
+            createUniqueIndexes()
+        }
+    }
+
+    private suspend fun createUniqueIndexes() {
+        val jobs = configurationReader.readJobsConfiguration()
+        jobs.forEach { jobConfig ->
+            if (jobConfig.jobDuplicateEntryPolicy?.uniqueIds != null) {
+                logger.info("Creating unique index for collection ${jobConfig.name}. Indices are: ${jobConfig.jobDuplicateEntryPolicy.uniqueIds}")
+                val collection = mongoDbSettings.database.getCollection<BsonDocument>(jobConfig.name)
+                collection.createIndex(
+                    Indexes.ascending(jobConfig.jobDuplicateEntryPolicy.uniqueIds),
+                    IndexOptions().unique(true)
+                )
             }
         }
     }
 
-    override suspend fun storeResult(jobId: String, result: List<ProcessedGamayunResult>, duplicateEntryPolicy: JobDuplicateEntryPolicy?) {
+    override suspend fun storeResult(
+        jobId: String,
+        result: List<ProcessedGamayunResult>,
+        duplicateEntryPolicy: JobDuplicateEntryPolicy?
+    ) {
         if (duplicateEntryPolicy == null) {
             storeWithNoDuplicatePolicy(jobId, result)
         } else {
             when (duplicateEntryPolicy.onDuplicateEntryPolicy) {
                 OnDuplicateEntry.IGNORE_NEW -> storeWithDuplicatePolicyIgnoreNew(jobId, result)
-                OnDuplicateEntry.STORE_NEW -> storeWithDuplicatePolicyStoreNew(jobId, result, duplicateEntryPolicy.uniqueIds)
+                OnDuplicateEntry.STORE_NEW -> storeWithDuplicatePolicyStoreNew(
+                    jobId,
+                    result,
+                    duplicateEntryPolicy.uniqueIds
+                )
                 OnDuplicateEntry.TRACK_CHANGES -> {
                 }
             }
@@ -65,13 +87,17 @@ class MongoDataRepository(kodein: DI) : DataRepository {
         }
     }
 
-    private suspend fun storeWithDuplicatePolicyStoreNew(jobId: String, result: List<ProcessedGamayunResult>, uniqueIds: List<String>) {
+    private suspend fun storeWithDuplicatePolicyStoreNew(
+        jobId: String,
+        result: List<ProcessedGamayunResult>,
+        uniqueIds: List<String>
+    ) {
         val collection = mongoDbSettings.database.getCollection<BsonDocument>(jobId)
         result.forEach { document ->
             val keysWithValues = uniqueIds
-                    .map { uniqueId -> Pair(uniqueId, document.stringData[uniqueId]) }
-                    .filter { it.second != null }
-                    .toMap()
+                .map { uniqueId -> Pair(uniqueId, document.stringData[uniqueId]) }
+                .filter { it.second != null }
+                .toMap()
 
             val updateKeysMatcher = BsonDocument().also { document ->
                 keysWithValues.forEach { keyWithValue ->
@@ -85,26 +111,30 @@ class MongoDataRepository(kodein: DI) : DataRepository {
 
     //for mongo we can  treat these two situations as the same
     private suspend fun storeWithNoDuplicatePolicy(jobId: String, result: List<ProcessedGamayunResult>) =
-            storeWithDuplicatePolicyIgnoreNew(jobId, result)
+        storeWithDuplicatePolicyIgnoreNew(jobId, result)
 
-    private suspend fun storeWithDuplicatePolicyTrackChanges(jobId: String, result: List<ProcessedGamayunResult>, uniqueIds: List<String>) {
+    private suspend fun storeWithDuplicatePolicyTrackChanges(
+        jobId: String,
+        result: List<ProcessedGamayunResult>,
+        uniqueIds: List<String>
+    ) {
         TODO("This feature needs further thinking on how exactly we want the data stored in the DB")
     }
 
 
     private fun ProcessedGamayunResult.toBsonDocument(): BsonDocument =
-            BsonDocument().also { document ->
-                stringListData.forEach { keyValuePair ->
-                    document[keyValuePair.key] = BsonArray().also { array ->
-                        keyValuePair.value.forEach { value ->
-                            array.add(BsonString(value))
-                        }
+        BsonDocument().also { document ->
+            stringListData.forEach { keyValuePair ->
+                document[keyValuePair.key] = BsonArray().also { array ->
+                    keyValuePair.value.forEach { value ->
+                        array.add(BsonString(value))
                     }
                 }
-
-                stringData.forEach { keyValuePair ->
-                    document[keyValuePair.key] = BsonString(keyValuePair.value)
-                }
             }
+
+            stringData.forEach { keyValuePair ->
+                document[keyValuePair.key] = BsonString(keyValuePair.value)
+            }
+        }
 
 }

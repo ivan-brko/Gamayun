@@ -4,16 +4,16 @@ import config.JobConfig
 import config.JobDuplicateEntryPolicy
 
 data class TaskConfig(
-        val name: String,
-        val pathToExe: String,
-        val args: List<String>?,
-        val resultWaitTimeoutMillis: Long,
-        val tags: List<String>?,
-        val jobDuplicateEntryPolicy: JobDuplicateEntryPolicy?
+    val name: String,
+    val pathToExe: String,
+    val args: List<String>?,
+    val resultWaitTimeoutMillis: Long,
+    val tags: List<String>?,
+    val jobDuplicateEntryPolicy: JobDuplicateEntryPolicy?
 )
 
 fun JobConfig.toTaskConfig() =
-        TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis, tags, jobDuplicateEntryPolicy)
+    TaskConfig(name, pathToExecutable, args, resultWaitTimeoutMillis, tags, jobDuplicateEntryPolicy)
 
 interface TaskSupervisor {
     suspend fun runTask(taskConfig: TaskConfig)

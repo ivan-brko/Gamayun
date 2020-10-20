@@ -13,8 +13,8 @@ private val logger = KotlinLogging.logger {}
 class MailNotifier private constructor(private val mailConfiguration: MailConfiguration) : Notifier {
     override fun reportErrorForJob(jobId: String, errorMessage: String?) {
         sendEmail(
-                mailSubject = "Gamayun report for job $jobId",
-                mailBody = errorMessage ?: "Did not receive results for $jobId",
+            mailSubject = "Gamayun report for job $jobId",
+            mailBody = errorMessage ?: "Did not receive results for $jobId",
         )
     }
 
@@ -28,20 +28,20 @@ class MailNotifier private constructor(private val mailConfiguration: MailConfig
 
     private fun sendEmail(mailSubject: String, mailBody: String? = null) {
         val email = EmailBuilder.startingBlank()
-                .to(mailConfiguration.recipientName, mailConfiguration.recipientEmail)
-                .from(mailConfiguration.senderName, mailConfiguration.senderEmail)
-                .withSubject(mailSubject)
-                .withPlainText(mailBody ?: "")
-                .buildEmail()
+            .to(mailConfiguration.recipientName, mailConfiguration.recipientEmail)
+            .from(mailConfiguration.senderName, mailConfiguration.senderEmail)
+            .withSubject(mailSubject)
+            .withPlainText(mailBody ?: "")
+            .buildEmail()
 
 
         MailerBuilder.withSMTPServer(
-                mailConfiguration.smtpHost,
-                mailConfiguration.smtpPort.toInt(),
-                mailConfiguration.mailUsername,
-                mailConfiguration.mailPassword
+            mailConfiguration.smtpHost,
+            mailConfiguration.smtpPort.toInt(),
+            mailConfiguration.mailUsername,
+            mailConfiguration.mailPassword
         ).buildMailer()
-                .sendMail(email)
+            .sendMail(email)
     }
 
     companion object {
