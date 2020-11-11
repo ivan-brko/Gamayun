@@ -26,6 +26,7 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
                 val arguments = parsedToml.getList<String>("arguments")
                     ?.map { it.replaceConfigurationFilePathPlaceholder(pathToConfig) }
                 val resultWaitTimeoutMillis = parsedToml.getLong("resultWaitTimeoutMillis") ?: 5000
+                val producesResult = parsedToml.getBoolean("producesResult") ?: true
                 val randomTriggerOffsetSeconds = parsedToml.getLong("randomTriggerOffsetSeconds")
                 val tags = parsedToml.getList<String>("tags")
                 val duplicateEntryPolicy = parsedToml.getDuplicateEntryPolicy()
@@ -38,7 +39,8 @@ class TomlConfigurationReader(private val configurationRoot: String) : Configura
                     resultWaitTimeoutMillis,
                     tags,
                     duplicateEntryPolicy,
-                    randomTriggerOffsetSeconds
+                    randomTriggerOffsetSeconds,
+                    producesResult
                 )
             } else {
                 logger.warn { "Configuration file $absoluteFile doesn't contain valid configuration. Will ignore file!" }

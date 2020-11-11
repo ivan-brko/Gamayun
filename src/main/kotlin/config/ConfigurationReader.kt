@@ -21,7 +21,8 @@ data class JobConfig(
     val resultWaitTimeoutMillis: Long,
     val tags: List<String>?,
     val jobDuplicateEntryPolicy: JobDuplicateEntryPolicy?,
-    val randomTriggerOffsetSeconds: Long?
+    val randomTriggerOffsetSeconds: Long?,
+    val producesResult: Boolean
 )
 
 data class MongoDbConfig(

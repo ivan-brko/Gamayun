@@ -11,6 +11,7 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import processing.ResultProcessor
 import storage.DataRepository
+import supervision.grpc.GamayunResult
 import java.io.IOException
 
 
@@ -37,17 +38,47 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
             processBuilder.start() //this line doesn't block until program stops executing, only until program is started
         }               //ignore the warning, this is wrapped in Dispatchers.IO so it's not a problem that it is blocking
 
+
         val result = listener.listenForResult(taskConfig.name, taskConfig.resultWaitTimeoutMillis)
 
         process.destroyAsync() //in case something is left hanging
 
-        if (result != null) {
-            when (result) {
-                is Either.Left -> {
-                    logger.warn { "Error reported for job ${taskConfig.name}\n${result.a}" }
-                    notifiers.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
-                }
-                is Either.Right -> {
+        handleTaskResults(result, taskConfig)
+
+    } catch (e: IOException) {
+        logger.warn { "IO error while listening for result for jobId ${taskConfig.name}: \n${e.stackTrace}" }
+    }
+
+    private suspend fun handleTaskResults(
+        result: Either<String, GamayunResult>?,
+        taskConfig: TaskConfig
+    ) {
+        when {
+            result != null -> { //in case we received some result
+                handleReceivedTaskResult(result, taskConfig)
+            }
+            taskConfig.producesResult -> { //if this task should have produced a result but it didn't
+                handleMissingTaskResults(taskConfig)
+            }
+        }
+    }
+
+    private fun handleMissingTaskResults(taskConfig: TaskConfig) {
+        logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
+        notifiers.forEach { it.reportErrorForJob(taskConfig.name) }
+    }
+
+    private suspend fun handleReceivedTaskResult(
+        result: Either<String, GamayunResult>,
+        taskConfig: TaskConfig
+    ) {
+        when (result) {
+            is Either.Left -> {
+                logger.warn { "Error reported for job ${taskConfig.name}\n${result.a}" }
+                notifiers.forEach { it.reportErrorForJob(taskConfig.name, result.a) }
+            }
+            is Either.Right -> {
+                if (taskConfig.producesResult) { //if we received a result and this task should report results
                     val processedRawData =
                         result.b.rawResults.map { resultProcessor.processRawResults(it, taskConfig.tags) }
                     val processedMapData =
@@ -55,15 +86,11 @@ class BasicTaskSupervisor(private val kodein: DI) : TaskSupervisor {
                     val allProcessedData = processedMapData + processedRawData
 
                     dataRepository.storeResult(taskConfig.name, allProcessedData)
+                } else { //if we received a result but this task shouldn't produce results
+                    logger.warn("Received a result for task ${taskConfig.name} which should not report results. Will ignore this result!")
                 }
             }
-        } else {
-            logger.warn { "No result received in TaskSupervisor for jobId ${taskConfig.name}" }
-            notifiers.forEach { it.reportErrorForJob(taskConfig.name) }
         }
-
-    } catch (e: IOException) {
-        logger.warn { "IO error while listening for result for jobId ${taskConfig.name}: \n${e.stackTrace}" }
     }
 
     private fun TaskConfig.toExecutableWithArgs(): List<String> =
